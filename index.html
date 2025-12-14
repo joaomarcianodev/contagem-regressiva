@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>December 19, 2025</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --theme-color: #ff4d6d; }
+
+        body {
+            height: 100vh; height: 100dvh;
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #111;
+            background-size: cover;
+            background-position: center;
+            color: white;
+            overflow: hidden; 
+            transition: background-image 0.5s ease;
+            user-select: none;
+        }
+
+        .overlay-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); z-index: 1;
+        }
+
+        /* --- LOGIN --- */
+        #login-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999; background: #2d3436;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        .login-input {
+            background: rgba(0,0,0,0.3); border: 1px solid #555; color: white;
+            padding: 12px; border-radius: 8px; text-align: center; font-size: 1.2rem; margin-bottom: 15px;
+        }
+        .btn-enter {
+            background-color: var(--theme-color); border: none; padding: 10px 30px;
+            border-radius: 20px; color: white; font-weight: bold;
+        }
+        .error-msg { color: #ff6b6b; margin-top: 10px; display: none; }
+
+        /* --- APP CONTENT --- */
+        #app-content {
+            position: relative; z-index: 2; height: 100%;
+            display: flex; flex-direction: column; justify-content: space-evenly; align-items: center;
+            padding: 10px; display: none; 
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 1rem; width: 90%; text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        h1 { font-family: 'Great Vibes', cursive; font-size: 2.5rem; color: var(--theme-color); }
+
+        /* --- GALERIA CARRETEL 3D --- */
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            overflow: hidden;
+        }
+
+        .gallery-item {
+            position: absolute;
+            width: 160px;
+            height: 220px;
+            background-color: #fff;
+            border-radius: 15px;
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border: 3px solid transparent;
+            overflow: hidden;
+            opacity: 0; /* Começa invisível se não tiver classe de posição */
+            transform: translateX(0) scale(0.5);
+            z-index: 0;
+        }
+
+        .gallery-item img {
+            width: 100%; height: 100%; object-fit: cover;
+            pointer-events: none;
+        }
+
+        /* --- POSIÇÕES DA GALERIA (SEM TRANSPARÊNCIA) --- */
+        
+        /* Centro (Atual) */
+        .item-center {
+            transform: translateX(0) scale(1.1);
+            z-index: 10;
+            opacity: 1;
+            border-color: var(--theme-color);
+            box-shadow: 0 0 25px var(--theme-color);
+        }
+
+        /* Lado Direito (Posterior) - Opacity 1 mantido */
+        .item-next-1 { transform: translateX(110px) scale(0.85); z-index: 8; opacity: 1; }
+        .item-next-2 { transform: translateX(200px) scale(0.65); z-index: 6; opacity: 1; }
+        .item-next-3 { transform: translateX(270px) scale(0.5);  z-index: 4; opacity: 1; }
+
+        /* Lado Esquerdo (Anterior) - Opacity 1 mantido */
+        .item-prev-1 { transform: translateX(-110px) scale(0.85); z-index: 8; opacity: 1; }
+        .item-prev-2 { transform: translateX(-200px) scale(0.65); z-index: 6; opacity: 1; }
+        .item-prev-3 { transform: translateX(-270px) scale(0.5);  z-index: 4; opacity: 1; }
+
+        /* Esconde o resto */
+        .item-hidden { opacity: 0; transform: scale(0); z-index: 0; }
+
+        /* --- MODAL TELA CHEIA --- */
+        #fullscreen-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 10000; /* Acima de tudo */
+            display: none; /* Escondido por padrão */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #fullscreen-img {
+            max-width: 95%;
+            max-height: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+        }
+
+        .close-btn {
+            margin-top: 20px;
+            color: white;
+            font-size: 1.2rem;
+            border: 2px solid white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            background: transparent;
+        }
+
+        /* --- RELÓGIO --- */
+        .countdown-row { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .time-box { text-align: center; }
+        .time-number { font-size: 1.5rem; font-weight: bold; display: block; }
+        .time-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; }
+
+    </style>
+</head>
+<body>
+
+    <div class="overlay-bg"></div>
+
+    <div id="login-screen">
+        <h3 class="mb-4">Data Especial?</h3>
+        <input type="text" id="passwordInput" class="login-input" placeholder="dd/mm/aaaa" maxlength="10" value="25/08/2024">
+        <button class="btn-enter" onclick="checkPassword()">Ver</button>
+        <div id="errorMsg" class="error-msg">Acesso Negado</div>
+    </div>
+
+    <div id="fullscreen-modal" onclick="closeFullscreen()">
+        <img id="fullscreen-img" src="" alt="Tela Cheia">
+        <button class="close-btn">Fechar</button>
+    </div>
+
+    <div id="app-content">
+        
+        <div class="info-card">
+            <h1>Contagem Regressiva</h1>
+            <div class="countdown-row">
+                <div class="time-box"><span class="time-number" id="days">00</span><span class="time-label">Dias</span></div>
+                <div class="time-box"><span class="time-number" id="hours">00</span><span class="time-label">Horas</span></div>
+                <div class="time-box"><span class="time-number" id="minutes">00</span><span class="time-label">Min</span></div>
+                <div class="time-box"><span class="time-number" id="seconds">00</span><span class="time-label">Seg</span></div>
+            </div>
+        </div>
+
+        <div class="gallery-container" id="gallery-wrapper">
+            </div>
+
+        <div class="info-card">
+            <div id="daily-message" style="font-size: 0.95rem; line-height: 1.5;">
+                Carregando...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO
+        // ============================================
+        const allPhotos = [
+  "foto1.jpg", "foto2.jpg", "foto3.jpg", "foto4.jpg", "foto5.jpg",
+  "foto6.jpg", "foto7.jpg", "foto8.jpg", "foto9.jpg", "foto10.jpg",
+  "foto11.jpg", "foto12.jpg", "foto13.jpg", "foto14.jpg", "foto15.jpg",
+  "foto16.jpg", "foto17.jpg", "foto18.jpg", "foto19.jpg", "foto20.jpg",
+  "foto21.jpg", "foto22.jpg", "foto23.jpg", "foto24.jpg", "foto25.jpg",
+  "foto26.jpg", "foto27.jpg", "foto28.jpg", "foto29.jpg", "foto30.jpg",
+  "foto31.jpg"
+];
+
+        const daysContent = [
+            { msg: "Faltam 7 dias! A saudade é realmente grande...", bg: "assets/background.png", color: "#ff4d6d" },
+            { msg: "Faltam 6 dias! Não esqueci do meu Brasil Cacau.", bg: "assets/background.png", color: "#6c5ce7" },
+            { msg: "Faltam 5 dias! Fique tranquila que passa rapidinho.", bg: "assets/background.png", color: "#00b894" },
+            { msg: "Faltam 4 dias! Como eu te amo meu amor.", bg: "assets/background.png", color: "#0984e3" },
+            { msg: "Faltam 3 dias! Rezando por esse momento.", bg: "assets/background.png", color: "#e17055" },
+            { msg: "Faltam 2 dias! Já preparei tudo pra vc!", bg: "assets/background.png", color: "#fdcb6e" },
+            { msg: "É AMANHÃ! Vem com Deus!", bg: "assets/background.png", color: "#d63031" },
+            { msg: "HOJE É O DIA!", bg: "assets/background.png", color: "#e84393" }
+        ];
+
+        const targetDate = new Date('December 19, 2025 03:00:00').getTime();
+
+        // ============================================
+        // LÓGICA DA GALERIA
+        // ============================================
+        let currentIndex = 0;
+        let galleryItems = [];
+        let autoPlayInterval; // Variável para controlar o timer
+
+        function initGallery() {
+            const wrapper = document.getElementById('gallery-wrapper');
+            wrapper.innerHTML = '';
+            galleryItems = [];
+
+            allPhotos.forEach((photo, index) => {
+                const el = document.createElement('div');
+                el.className = 'gallery-item';
+                // Usando placeholder para teste se a imagem não existir
+                el.innerHTML = `<img src="assets/img/${photo}" onerror="this.src='https://via.placeholder.com/160x220?text=${index+1}'">`;
+                
+                // LÓGICA DE CLIQUE
+                el.onclick = () => {
+                    let diff = index - currentIndex;
+                    // Ajuste loop
+                    if (diff > allPhotos.length / 2) diff -= allPhotos.length;
+                    if (diff < -allPhotos.length / 2) diff += allPhotos.length;
+                    
+                    if (diff === 0) {
+                        // CLICOU NA FOTO DO CENTRO -> TELA CHEIA
+                        openFullscreen(`assets/img/${photo}`);
+                    } else {
+                        // CLICOU NA LATERAL -> MOVE GALERIA
+                        moveGallery(diff);
+                        resetAutoPlay(); // Reseta o tempo de 3s para o usuário ler
+                    }
+                };
+
+                wrapper.appendChild(el);
+                galleryItems.push(el);
+            });
+
+            updateGalleryPositions();
+            setupTouchEvents();
+            startAutoPlay(); // Inicia o carrossel automático
+        }
+
+        function updateGalleryPositions() {
+            const total = allPhotos.length;
+            galleryItems.forEach((item, i) => {
+                item.className = 'gallery-item';
+                let offset = (i - currentIndex + total) % total;
+                if (offset > total / 2) offset -= total;
+
+                if (offset === 0) item.classList.add('item-center');
+                else if (offset === 1) item.classList.add('item-next-1');
+                else if (offset === 2) item.classList.add('item-next-2');
+                else if (offset === 3) item.classList.add('item-next-3');
+                else if (offset === -1) item.classList.add('item-prev-1');
+                else if (offset === -2) item.classList.add('item-prev-2');
+                else if (offset === -3) item.classList.add('item-prev-3');
+                else item.classList.add('item-hidden');
+            });
+        }
+
+        function moveGallery(direction) {
+            const total = allPhotos.length;
+            currentIndex = (currentIndex + direction + total) % total;
+            updateGalleryPositions();
+        }
+
+        // --- CONTROLE AUTOMÁTICO (3 SEGUNDOS) ---
+        function startAutoPlay() {
+            // Limpa qualquer timer existente para evitar duplicação
+            clearInterval(autoPlayInterval);
+            // Cria um novo timer de 3000ms (3 segundos)
+            autoPlayInterval = setInterval(() => {
+                moveGallery(1); // Move 1 para frente
+            }, 3000);
+        }
+
+        function stopAutoPlay() {
+            clearInterval(autoPlayInterval);
+        }
+
+        function resetAutoPlay() {
+            stopAutoPlay();
+            startAutoPlay();
+        }
+
+        // --- FUNÇÕES DE TELA CHEIA ---
+        function openFullscreen(imageSrc) {
+            stopAutoPlay(); // Para o carrossel enquanto vê a foto
+            const modal = document.getElementById('fullscreen-modal');
+            const img = document.getElementById('fullscreen-img');
+            
+            // Tenta carregar a imagem, se falhar usa placeholder (para testes)
+            img.src = imageSrc;
+            img.onerror = function() { this.src = 'https://via.placeholder.com/400x600?text=Foto+Grande'; };
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeFullscreen() {
+            document.getElementById('fullscreen-modal').style.display = 'none';
+            startAutoPlay(); // Volta a rodar o carrossel
+        }
+
+        // --- SISTEMA DE TOUCH (SWIPE) ---
+        function setupTouchEvents() {
+            const container = document.getElementById('gallery-wrapper');
+            let startX = 0;
+            let isDragging = false;
+
+            container.addEventListener('touchstart', (e) => {
+                stopAutoPlay(); // Para enquanto o usuário põe o dedo
+                startX = e.touches[0].clientX;
+                isDragging = true;
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                if(!isDragging) return;
+                e.preventDefault(); 
+            });
+
+            container.addEventListener('touchend', (e) => {
+                if(!isDragging) return;
+                const endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) moveGallery(1);
+                    else moveGallery(-1);
+                }
+                isDragging = false;
+                startAutoPlay(); // Volta a rodar quando tira o dedo
+            });
+        }
+
+        // --- LOGIN E LÓGICA GERAL ---
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            if (input === '25/08/2024') {
+                document.getElementById('login-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('app-content').style.display = 'flex';
+                    initGallery();
+                    initAppLogic();
+                }, 500);
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        function initAppLogic() {
+            updatePageContent();
+            setInterval(updateTimer, 1000);
+            setInterval(updatePageContent, 60000);
+        }
+
+        function updatePageContent() {
+            const now = new Date();
+            const startDate = new Date('December 12, 2025 00:00:00');
+            const diffTime = now - startDate;
+            let dayIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (dayIndex < 0) dayIndex = 0;
+            if (dayIndex >= daysContent.length) dayIndex = daysContent.length - 1;
+
+            const content = daysContent[dayIndex];
+            document.getElementById('daily-message').innerText = content.msg;
+            document.documentElement.style.setProperty('--theme-color', content.color);
+            document.body.style.backgroundImage = `url('${content.bg}')`;
+        }
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                document.querySelector('.countdown-row').innerHTML = "<h3>❤️</h3>";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = String(days).padStart(2, '0');
+            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+        }
+
+        document.getElementById('passwordInput').addEventListener('input', function (e) {
+            var x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,2})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : x[1] + '/' + x[2] + (x[3] ? '/' + x[3] : '');
+        });
+        
+        document.getElementById("passwordInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") checkPassword();
+        });
+
+    </script>
+</body>
+</html>
