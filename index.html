@@ -209,21 +209,22 @@
         ];
 
         const daysContent = [
-            { msg: "TÔ CHEGANDOOOOO!", bg: "assets/background2.jpeg", color: "#e84393" },
-            { msg: "É AMANHÃ! Ansiedade a mil!", bg: "assets/background2.jpeg", color: "#d63031" },
-            { msg: "Faltam 2 dias! Você vai me aguentar mesmo esses dias todos? Espero que sim, não tem mais volta!", bg: "assets/background2.jpeg", color: "#fdcb6e" },
-            { msg: "Faltam 3 dias! Te amo te amo te amo te amooooo.", bg: "assets/background2.jpeg", color: "#e17055" },
-            { msg: "Faltam 4 dias! Eta tempo que não passa, chega logo sexta-feiraaaa.", bg: "assets/background2.jpeg", color: "#0984e3" },
-            { msg: "Faltam 5 dias! Rezar com você já é bom, agora rezar presencialmente é melhor ainda!", bg: "assets/background2.jpeg", color: "#00b894" },
-            { msg: "Faltam 6 dias! Lembrei q ainda temos q ir na Brasil Cacau hein.", bg: "assets/background2.jpeg", color: "#6c5ce7" },
-            { msg: "Faltam 7 dias! Vou te dar o abraço mais forte do mundoooo", bg: "assets/background2.jpeg", color: "#ff4d6d" }
+            { msg: "Já tô no ônibus a caminho!", bg: "assets/background3.jpeg", color: "#e84393" },
+            { msg: "Te vejo amanhã! Beijinhos ❤️❤️❤️", bg: "assets/background3.jpeg", color: "#d63031" },
+            { msg: "Faltam 2 dias! É claro que te amo mais do que um sorvete da DuGellato!", bg: "assets/background3.jpeg", color: "#fdcb6e" },
+            { msg: "Faltam 3 dias! Melhor do que um sorvete da DuGellato? Só o seu abraço!!", bg: "assets/background3.jpeg", color: "#e17055" },
+            { msg: "Faltam 4 dias! Então vamos no cinema juntos, uiuiui", bg: "assets/background3.jpeg", color: "#0984e3" },
+            { msg: "Faltam 5 dias!", bg: "assets/background3.jpeg", color: "#00b894" },
+            { msg: "Faltam 6 dias!", bg: "assets/background3.jpeg", color: "#6c5ce7" },
+            { msg: "Faltam 7 dias!", bg: "assets/background3.jpeg", color: "#ff4d6d" }
         ];
 
         const beforeTimer = {msg: "Sei que ainda falta um tempinho, mas jájá chega! ❤️", bg: "assets/background1.jpeg", color: "#ff7675" };
-        const afterTimer = {msg: "Te amo meu amorzinho! ❤️", bg: "assets/background2.jpeg", color: "##de41f0" };
+        const afterTimer = {msg: "Te amo meu amor! ❤️", bg: "assets/background3.jpeg", color: "##de41f0" };
 
-        const targetDate = new Date("June 05, 2026 07:00:00").getTime();
-
+        //! DEFINIR DATA AQUI:
+        const targetDate = new Date("2026-09-15T07:30:00");
+        
         // ============================================
         // LÓGICA DA GALERIA
         // ============================================
@@ -383,25 +384,41 @@
         }
 
         function updatePageContent() {
-            const distance = targetDate - new Date().getTime();
-            let dayIndex = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const now = new Date();
+
+            const today = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate()
+            );
+
+            const target = new Date(
+                targetDate.getFullYear(),
+                targetDate.getMonth(),
+                targetDate.getDate()
+            );
+
+            const distance = Math.round(
+                (target - today) / (1000 * 60 * 60 * 24)
+            );
 
             let content;
-            if (dayIndex < 0) {
+
+            if (distance < 0) {
                 content = afterTimer;
-            } else if (dayIndex >= daysContent.length) {
+            } else if (distance > 7) {
                 content = beforeTimer;
             } else {
-                content = daysContent[dayIndex];
+                content = daysContent[distance];
             }
 
             document.getElementById('daily-message').innerText = content.msg;
-                document.documentElement.style.setProperty('--theme-color', content.color);
-                document.body.style.backgroundImage = `url('${content.bg}')`;
+            document.documentElement.style.setProperty('--theme-color', content.color);
+            document.body.style.backgroundImage = `url('${content.bg}')`;
         }
 
         function updateTimer() {
-            const distance = targetDate - new Date().getTime();
+            const distance = targetDate.getTime() - new Date().getTime();
 
             if (distance < 0) {
                 document.querySelector('.countdown-row').innerHTML = "<h3>❤️</h3>";
